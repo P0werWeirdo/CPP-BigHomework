@@ -1,4 +1,5 @@
 #include "client.h"
+#include"administrator.h"
 #include<QFile>
 #include<QCoreApplication>
 #include<QTextStream>
@@ -41,7 +42,7 @@ void Client::initClientList(){
                tmp->name = clientData[2];
                //读电话 余额 地址
                tmp->phoneNum = clientData[3];
-               tmp->balance = clientData[4].toInt();
+               tmp->balance = clientData[4].toDouble();
                tmp->address = clientData[5];
                clientList.insert(tmp->getUsername(),tmp);                                          //添加到总客户表
 
@@ -67,24 +68,51 @@ bool Client::saveClientList(){
         }
 
     }
+    else{
+        return false;
+    }
     file.close();
+    return true;
 }
 
-void Client::sendPackage(QString username,Package *pkg){    //发送快递
+bool Client::sendPackage(Client* recver,QString remarks,double price){    //发送快递
+    if(remarks.length() == 0 || remarks.length() > 200){
+        return false;
+    }
+    if(this->balance < price){
+        return false;
+    }
+    else{
+        this->balance -=price;
+        Administrator::admin.changeBalance(15);
+    }
+    Package* newpkg = new Package(this,recver,remarks);
+    Package::packageList.insert(newpkg->getIndex(),newpkg);
+    this->myPackage.insert(newpkg->getIndex(),newpkg);
+    recver->myPackage.insert(newpkg->getIndex(),newpkg);
+    Administrator::saveAdmin();
+    Client::saveClientList();
+    Package::savePackage();
+    return true;
 }
-void Client::recvPackage(Package *pkg){                     //接受快递
 
-}
+//void Client::recvPackage(Package *pkg){                     //接受快递
+
+//}
 
 bool Client::changeAddress(QString newAddr){           //改变地址
     if(newAddr.length() == 0){
         return false;
     }
     this->address = newAddr;
+    //Administrator::saveAdmin();
+    Client::saveClientList();
+    //Package::savePackage();
     return true;
 }
 
-//注册新用户 返回1: 用户名过长或过短 返回2：用户名重复 返回3:密码过长或过短 返回4:手机号不符合格式 返回5:姓名检测 返回6:地址检测 返回0:注册成功
+//注册新用户 返回1: 用户名过长或过短 返回2：用户名重复 返回3:密码过长或过短 返回4:手机号不符合格式 返回5:姓名检测 返回6:地址检测
+//返回7:地址过长 返回0:注册成功
 int Client::registerNewClient(QString username,QString password,QString name,QString phoneNum,QString address){
     //用户名检测
     if(username.length() < 4 || username.length() > 20){
@@ -112,6 +140,10 @@ int Client::registerNewClient(QString username,QString password,QString name,QSt
                 return 4;
             }
         }
+   }
+
+   if(address.length() >= 200){
+       return 7;
    }
 
    Client *newClient = new Client(username,password,name,phoneNum,address);

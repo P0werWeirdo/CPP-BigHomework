@@ -56,6 +56,9 @@ void RegisterWindow::registerClient(){
     case 6:
         ui->Input_Error->setText("地址不能为空");
         break;
+    case 7:
+        ui->Input_Error->setText("地址过长");
+        break;
     default:
         QMessageBox::about(this, "注册成功", "您已完成注册");
         this->close();

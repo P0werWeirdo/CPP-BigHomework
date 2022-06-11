@@ -2,7 +2,7 @@
 #define USERLISTWINDOW_H
 
 #include <QDialog>
-
+#include<QTableWidgetItem>
 namespace Ui {
 class UserListWindow;
 }
@@ -14,6 +14,9 @@ class UserListWindow : public QDialog
 public:
     explicit UserListWindow(QWidget *parent = nullptr);
     ~UserListWindow();
+
+    void showClientInfo();
+    void showDetailInfo(QTableWidgetItem *item);
 
 private:
     Ui::UserListWindow *ui;

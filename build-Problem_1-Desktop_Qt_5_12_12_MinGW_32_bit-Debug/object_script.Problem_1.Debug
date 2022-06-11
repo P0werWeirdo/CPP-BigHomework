@@ -1,3 +1,4 @@
+debug/addmoney.o
 debug/administrator.o
 debug/adminwindow.o
 debug/changepassword.o
@@ -9,9 +10,12 @@ debug/package.o
 debug/packageinfowindow.o
 debug/packagelistwindow.o
 debug/registerwindow.o
+debug/sendpackagewindow.o
+debug/signforpackagewindow.o
 debug/user.o
 debug/userinfowindow.o
 debug/userlistwindow.o
+debug/moc_addmoney.o
 debug/moc_adminwindow.o
 debug/moc_changepassword.o
 debug/moc_clientwindow.o
@@ -19,5 +23,7 @@ debug/moc_loginwindow.o
 debug/moc_packageinfowindow.o
 debug/moc_packagelistwindow.o
 debug/moc_registerwindow.o
+debug/moc_sendpackagewindow.o
+debug/moc_signforpackagewindow.o
 debug/moc_userinfowindow.o
 debug/moc_userlistwindow.o

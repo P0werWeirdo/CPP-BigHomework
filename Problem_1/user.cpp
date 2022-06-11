@@ -1,5 +1,6 @@
 #include "user.h"
 #include"package.h"
+#include"administrator.h"
 User::User(){
 
 }
@@ -15,13 +16,13 @@ QString User::getName()const{      //获取用户名字
 QString User::getPhoneNum()const{  //获取用户电话
     return this->phoneNum;
 }
-int User::getBalance()const{       //获取用户余额
+double User::getBalance()const{       //获取用户余额
     return this->balance;
 }
 QString User::getPassword()const{  //获取用户密码
     return this->password;
 }
-QMap<QString,Package *>   User::getMyPackage()const{  //获取用户包裹
+QMap<QString,Package *>&   User::getMyPackage(){  //获取用户包裹
     return this->myPackage;
 }
 /*修改相关函数，成功返回true，失败返回false*/
@@ -34,9 +35,11 @@ bool User::changePassword(QString oldPassword,QString newPassword)   //修改密
         return false;
     }
     this->password = newPassword;
+    Client::saveClientList();
+    Administrator::saveAdmin();
     return true;
 }
-bool User::changeBalance(int num){                                    //修改余额
+bool User::changeBalance(double num){                                    //修改余额
     if(num > 0){
         if(num + this->balance < 0){      //溢出
             return false;
@@ -51,7 +54,9 @@ bool User::changeBalance(int num){                                    //修改�
         }else{
             this->balance += num;
         }
-    }
+    }    
+    Client::saveClientList();
+    Administrator::saveAdmin();
     return true;
 }
 
@@ -68,6 +73,8 @@ bool User::changePhoneNum(QString phoneNum){                          //修改�
         }
     }
     this->phoneNum = phoneNum;
+    Client::saveClientList();
+    Administrator::saveAdmin();
     return true;
 }
 
@@ -77,10 +84,12 @@ bool User::saveToMyPackage(Package *pkg){
         this->myPackage.insert(pkg->getIndex(),pkg);
         return true;
     }
+    Package::savePackage();
     return false;
 }
 
 //删除快递
 bool User::deleteFromMyPackage(Package *pkg){
+    Package::savePackage();
     return this->myPackage.remove(pkg->getIndex()) == 1;
 }

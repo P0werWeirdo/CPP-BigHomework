@@ -15,8 +15,8 @@ public:
     static void initClientList();
     static bool saveClientList();
     /*对快递进行相关操作*/
-    void sendPackage(QString username,Package *pkg);    //发送快递
-    void recvPackage(Package *pkg);                     //收到快递
+    bool sendPackage(Client *recver,QString remarks,double price);    //发送快递
+//    void recvPackage(Package *pkg);                     //收到快递
 
 
 

@@ -3,6 +3,7 @@
 #include"administrator.h"
 #include"packagelistwindow.h"
 #include"userlistwindow.h"
+#include"changepassword.h"
 
 AdminWindow::AdminWindow(QDialog *parent) :
     QDialog(parent),
@@ -13,7 +14,18 @@ AdminWindow::AdminWindow(QDialog *parent) :
 
     /*绑定按键逻辑*/
     connect(ui->btn_SearchPkg,&QPushButton::clicked,this,&AdminWindow::searchPkg);
-    connect(ui->btn_SearchPkg,&QPushButton::clicked,this,&AdminWindow::searchUser);
+    connect(ui->btn_SearchUser,&QPushButton::clicked,this,&AdminWindow::searchUser);
+    connect(ui->btn_Exit,&QPushButton::clicked,[=](){
+       emit adminExit();
+       this->hide();
+       this->destroy();
+    });
+    connect(ui->btn_ChangePassword,&QPushButton::clicked,[=](){
+        User *tmp = &Administrator::admin;
+        ChangePassword* cg = new ChangePassword(tmp,this);
+        cg->show();
+     });
+
     /*展示信息*/
     showInfo();
 }
@@ -35,7 +47,8 @@ void AdminWindow::searchPkg(){
 
 /*查找用户*/
 void AdminWindow::searchUser(){
-
+    UserListWindow *userlist = new UserListWindow(this);
+    userlist->show();
 }
 
 AdminWindow::~AdminWindow()

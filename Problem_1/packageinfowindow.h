@@ -2,7 +2,7 @@
 #define PACKAGEINFOWINDOW_H
 
 #include <QDialog>
-
+#include"package.h"
 namespace Ui {
 class PackageInfoWindow;
 }
@@ -12,10 +12,13 @@ class PackageInfoWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit PackageInfoWindow(QWidget *parent = nullptr);
+    //status
+    explicit PackageInfoWindow(Package *pkg,QWidget *parent = nullptr);
+    void showInfo();
     ~PackageInfoWindow();
 
 private:
+    Package* pkg;
     Ui::PackageInfoWindow *ui;
 };
 

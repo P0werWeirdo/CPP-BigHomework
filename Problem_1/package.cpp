@@ -14,7 +14,37 @@ Package::Package()
     this->recver = NULL;        //空指针
     this->status = 0;           //包裹状态
 }
+Package::Package(Client* sender,Client *recver,QString remark){
+    this->index = createTotalPackage();
+    incTotalPackage();
+    this->sender = sender;
+    this->recver = recver;
+    this->sendTime = QDateTime::currentDateTime();
+    this->recvTime = QDateTime::fromSecsSinceEpoch(0);
+    this->status = 1;
+    this->remark = remark;
+    //packageList.insert(this->index,this);
+}
 
+void Package::recvpkg(){
+    this->status = 2;
+    this->recvTime = QDateTime::currentDateTime();
+}
+
+bool Package::recvpkgList(QList<Package *> pkgList){
+    int len = pkgList.length();
+    bool isAllFinish = true;
+    for(int i = 0;i < len;i++){
+        if(pkgList[i] != NULL){
+            pkgList[i]->recvpkg();
+        }
+        else{
+            isAllFinish = false;
+        }
+    }
+    savePackage();
+    return isAllFinish;
+}
 
 QString Package::getIndex()const{         //获取快递单号
     return this->index;
@@ -123,10 +153,15 @@ bool Package::savePackage(){
             in << (short)(iter.value()->getStatus()) << endl;
         }
     }
+    else{
+        return false;
+    }
     file.close();
+    return true;
 }
-/*查询方式集合*/
-Package* Package::searchByIndex(QMap<QString,Package *> &myPackage,QString Index){
+
+/*查询方式集合.方便以后使用*/
+Package* Package::searchByIndex(QMap<QString,Package *> &myPackage,QString Index)const{
     if(myPackage.contains(Index)){
         return myPackage[Index];
     }
@@ -134,7 +169,7 @@ Package* Package::searchByIndex(QMap<QString,Package *> &myPackage,QString Index
 }
 
 /*按天查询*/
-QList<Package*> Package::searchBySendTime(QMap<QString,Package *> &myPackage,QDateTime time){
+QList<Package*> Package::searchBySendTime(QMap<QString,Package *> &myPackage,QDateTime time)const{
     QList<Package*> tmp;
 //    QDateTime upTime = time.addDays(1);
     for(auto iter = myPackage.begin(); iter != myPackage.end(); iter++){
@@ -145,7 +180,7 @@ QList<Package*> Package::searchBySendTime(QMap<QString,Package *> &myPackage,QDa
     return tmp;
 }
 
-QList<Package*> Package::searchByRecvTime(QMap<QString,Package *> &myPackage,QDateTime time){
+QList<Package*> Package::searchByRecvTime(QMap<QString,Package *> &myPackage,QDateTime time)const{
     QList<Package*> tmp;
 //    QDateTime upTime = time.addDays(1);
     for(auto iter = myPackage.begin(); iter != myPackage.end(); iter++){
@@ -156,7 +191,7 @@ QList<Package*> Package::searchByRecvTime(QMap<QString,Package *> &myPackage,QDa
     return tmp;
 }
 
-QList<Package*> Package::searchByUsername(QMap<QString,Package *> &myPackage,QString username){
+QList<Package*> Package::searchByUsername(QMap<QString,Package *> &myPackage,QString username)const{
     QList<Package*> tmp;
 //    QDateTime upTime = time.addDays(1);
     for(auto iter = myPackage.begin(); iter != myPackage.end(); iter++){
@@ -173,6 +208,23 @@ QString Package::getStatusString()const{
         return "待签收";
     }
     return "已签收";
+}
+
+/*生成快递单号字符串*/
+QString Package::createTotalPackage(){
+    QString tmp = QString::number(totalPackage);
+    QString res;
+    int len = tmp.length();
+    for(int i = 0;i + len <  8; i++){
+        res.push_back('0');
+    }
+    res.push_back(tmp);
+    return res;
+}
+
+/*总快递单号+1*/
+void Package::incTotalPackage(){
+    totalPackage++;
 }
 
 QMap<QString,Package *>& Package::getPackageList(){

@@ -15,13 +15,13 @@ public:
     QString getName()const;      //获取用户名字
     QString getPhoneNum()const;  //获取用户电话
     QString getPassword()const;  //获取用户密码
-    int getBalance()const;       //获取用户余额
-    QMap<QString,Package *>   getMyPackage()const;   //获取用户快递信息
+    double getBalance()const;       //获取用户余额
+    QMap<QString,Package *>&   getMyPackage();   //获取用户快递信息
     bool addToMyPackage(Package *pkg);          //向用户快递列表添加
 
     /*修改相关函数，成功返回true，失败返回false*/
     bool changePassword(QString oldPassword,QString newPassword);   //修改密码
-    bool changeBalance(int num);                                    //修改余额
+    bool changeBalance(double num);                                    //修改余额
     bool changePhoneNum(QString phoneNum);                       //修改电话
 
     bool saveToMyPackage(Package *pkg);                         //将某一快递保存到User里
@@ -32,7 +32,7 @@ protected:
     QString password;       //密码
     QString name;           //姓名
     QString phoneNum;       //电话
-    int balance;            //余额
+    double balance;            //余额
      QMap<QString,Package *>   myPackage;    //我的快递
 
 };

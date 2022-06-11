@@ -64,13 +64,18 @@ bool LoginWindow::userLogin(){
     if(ui->btn_Client->isChecked()){        //根据radio按钮判断是否选中
 //        qDebug()<<"客户选中";
         //用户不存在 或者 密码错误
-          if(Client::clientList.value(ui->Username_Line->text()) == 0x0 ||
-             Client::clientList.value(ui->Username_Line->text())->getPassword() != ui->Password_Line->text()){
+          if(Client::clientList.contains(ui->Username_Line->text()) == false ||
+             Client::clientList[ui->Username_Line->text()]->getPassword() != ui->Password_Line->text()){
             ui->Input_Error->setText("用户不存在或密码错误");
             ui->Input_Error->show();
           }
           else{
-             ClientWindow *cw = new ClientWindow(this); //挂到对象树上
+             ClientWindow *cw = new ClientWindow(this,Client::clientList[ui->Username_Line->text()]); //挂到对象树上
+             connect(cw,&ClientWindow::clientExit,[=](){
+                 ui->Password_Line->setText("");
+                 ui->Input_Error->hide();
+                 this->show();
+             });
              cw->show();
              this->hide();
              return true;
@@ -85,6 +90,10 @@ bool LoginWindow::userLogin(){
         }
         else{
            AdminWindow *aw = new AdminWindow(this);  //挂到对象树上
+           connect(aw,&AdminWindow::adminExit,[=](){
+               ui->Password_Line->setText("");
+               this->show();
+           });
            aw->setModal(true);
            this->hide();
            aw->show();

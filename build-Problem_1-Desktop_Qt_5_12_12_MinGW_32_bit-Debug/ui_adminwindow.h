@@ -44,9 +44,9 @@ public:
     QWidget *widget_6;
     QHBoxLayout *horizontalLayout_5;
     QSpacerItem *horizontalSpacer;
-    QPushButton *pushButton;
+    QPushButton *btn_ChangePassword;
     QSpacerItem *horizontalSpacer_2;
-    QPushButton *pushButton_2;
+    QPushButton *btn_Exit;
     QSpacerItem *horizontalSpacer_3;
     QPushButton *btn_SearchPkg;
     QPushButton *btn_SearchUser;
@@ -148,19 +148,19 @@ public:
 
         horizontalLayout_5->addItem(horizontalSpacer);
 
-        pushButton = new QPushButton(widget_6);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        btn_ChangePassword = new QPushButton(widget_6);
+        btn_ChangePassword->setObjectName(QString::fromUtf8("btn_ChangePassword"));
 
-        horizontalLayout_5->addWidget(pushButton);
+        horizontalLayout_5->addWidget(btn_ChangePassword);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_5->addItem(horizontalSpacer_2);
 
-        pushButton_2 = new QPushButton(widget_6);
-        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        btn_Exit = new QPushButton(widget_6);
+        btn_Exit->setObjectName(QString::fromUtf8("btn_Exit"));
 
-        horizontalLayout_5->addWidget(pushButton_2);
+        horizontalLayout_5->addWidget(btn_Exit);
 
         horizontalSpacer_3 = new QSpacerItem(41, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -192,8 +192,8 @@ public:
         PhoneNum_Line->setText(QApplication::translate("AdminWindow", "TextLabel", nullptr));
         label_5->setText(QApplication::translate("AdminWindow", "\344\275\231\351\242\235:", nullptr));
         Balance_Line->setText(QApplication::translate("AdminWindow", "TextLabel", nullptr));
-        pushButton->setText(QApplication::translate("AdminWindow", "\344\277\256\346\224\271\345\257\206\347\240\201", nullptr));
-        pushButton_2->setText(QApplication::translate("AdminWindow", "\351\200\200\345\207\272\347\231\273\345\275\225", nullptr));
+        btn_ChangePassword->setText(QApplication::translate("AdminWindow", "\344\277\256\346\224\271\345\257\206\347\240\201", nullptr));
+        btn_Exit->setText(QApplication::translate("AdminWindow", "\351\200\200\345\207\272\347\231\273\345\275\225", nullptr));
         btn_SearchPkg->setText(QApplication::translate("AdminWindow", "\346\237\245\350\257\242\345\277\253\351\200\222\344\277\241\346\201\257", nullptr));
         btn_SearchUser->setText(QApplication::translate("AdminWindow", "\346\237\245\350\257\242\347\224\250\346\210\267\344\277\241\346\201\257", nullptr));
     } // retranslateUi

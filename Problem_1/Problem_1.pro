@@ -9,6 +9,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    addmoney.cpp \
     administrator.cpp \
     adminwindow.cpp \
     changepassword.cpp \
@@ -20,11 +21,14 @@ SOURCES += \
     packageinfowindow.cpp \
     packagelistwindow.cpp \
     registerwindow.cpp \
+    sendpackagewindow.cpp \
+    signforpackagewindow.cpp \
     user.cpp \
     userinfowindow.cpp \
     userlistwindow.cpp
 
 HEADERS += \
+    addmoney.h \
     administrator.h \
     adminwindow.h \
     changepassword.h \
@@ -35,11 +39,14 @@ HEADERS += \
     packageinfowindow.h \
     packagelistwindow.h \
     registerwindow.h \
+    sendpackagewindow.h \
+    signforpackagewindow.h \
     user.h \
     userinfowindow.h \
     userlistwindow.h
 
 FORMS += \
+    addmoney.ui \
     adminwindow.ui \
     changepassword.ui \
     clientwindow.ui \
@@ -47,6 +54,8 @@ FORMS += \
     packageinfowindow.ui \
     packagelistwindow.ui \
     registerwindow.ui \
+    sendpackagewindow.ui \
+    signforpackagewindow.ui \
     userinfowindow.ui \
     userlistwindow.ui
 
