@@ -16,7 +16,7 @@ public:
     void addConfirm();  //充值操作检测
     ~AddMoney();
 signals:
-    void addFinish();
+    void addFinish()const;
 private:
     Client* theClient;
     Ui::AddMoney *ui;

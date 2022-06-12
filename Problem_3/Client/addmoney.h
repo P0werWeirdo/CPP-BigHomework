@@ -2,7 +2,9 @@
 #define ADDMONEY_H
 
 #include <QDialog>
-#include"client.h"
+#include<QJsonArray>
+#include<QJsonDocument>
+#include<QJsonObject>
 namespace Ui {
 class AddMoney;
 }
@@ -12,13 +14,15 @@ class AddMoney : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddMoney(Client *c,QWidget *parent = nullptr);
-    void addConfirm();  //充值操作检测
+    explicit AddMoney(QJsonObject c,QWidget *parent = nullptr);
+    void addReq()const;  //充值操作检测
+    void addRes();  //
+
     ~AddMoney();
 signals:
     void addFinish();
 private:
-    Client* theClient;
+    QJsonObject theClient;
     Ui::AddMoney *ui;
 };
 

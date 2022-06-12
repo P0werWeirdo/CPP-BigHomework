@@ -2,7 +2,7 @@
 #define ADMINWINDOW_H
 
 #include <QDialog>
-
+#include<QJsonObject>
 namespace Ui {
 class AdminWindow;
 }
@@ -12,7 +12,7 @@ class AdminWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit AdminWindow(QDialog *parent = nullptr);
+    explicit AdminWindow(QJsonObject admin,QDialog *parent = nullptr);
     ~AdminWindow();
     void showInfo();
     void searchPkg();
@@ -22,6 +22,7 @@ signals:
 
 
 private:
+    QJsonObject admin;
     Ui::AdminWindow *ui;
 };
 

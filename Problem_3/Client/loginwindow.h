@@ -18,7 +18,10 @@ public:
     bool userLogin();                                  //用户登录
     void userRegister();                               //用户注册
     bool clientRegister(QString username,QString password,QString name,QString phoneNum);                                  //注册用户
-    void initConnect();
+    void initConnect();                                 //初始化连接
+    void adminLogin();
+    void clientLogin();
+    void courierLogin();
 
     static QTcpSocket *con;
     QEventLoop loop;

@@ -2,7 +2,7 @@
 #define PACKAGEINFOWINDOW_H
 
 #include <QDialog>
-#include"package.h"
+#include<QJsonObject>
 namespace Ui {
 class PackageInfoWindow;
 }
@@ -13,12 +13,14 @@ class PackageInfoWindow : public QDialog
 
 public:
 
-    explicit PackageInfoWindow(Package *pkg,QWidget *parent = nullptr);
+    explicit PackageInfoWindow(QJsonObject pkg,QWidget *parent = nullptr);
     void showInfo();
     ~PackageInfoWindow();
 
+    qint64 getLongData(QJsonObject json, QString key);
+
 private:
-    Package* pkg;
+    QJsonObject pkg;
     Ui::PackageInfoWindow *ui;
 };
 

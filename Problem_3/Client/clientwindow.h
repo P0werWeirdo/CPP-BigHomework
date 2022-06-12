@@ -2,7 +2,7 @@
 #define CLIENTWINDOW_H
 
 #include <QDialog>
-#include"client.h"
+#include<QJsonObject>
 
 namespace Ui {
 class ClientWindow;
@@ -13,15 +13,16 @@ class ClientWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit ClientWindow(QDialog *parent = nullptr,Client *c = NULL);
+    explicit ClientWindow(QJsonObject c,QDialog *parent = nullptr);
     ~ClientWindow();
-    void showInfo();
-    void receiveClient(Client *c);
-
+    void showInfo();        //展示信息
+    void freshUserRequest()const;       //刷新信息
+    void freshSuccess();
 signals:
     void clientExit();
+
 private:
-    Client *theClient;
+    QJsonObject theClient;
     Ui::ClientWindow *ui;
 };
 

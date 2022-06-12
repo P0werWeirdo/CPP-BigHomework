@@ -10,52 +10,36 @@ CONFIG += c++11
 
 SOURCES += \
     addmoney.cpp \
-    administrator.cpp \
     adminwindow.cpp \
-    book.cpp \
     changepassword.cpp \
-    client.cpp \
     clientwindow.cpp \
-    common.cpp \
-    courier.cpp \
     courierwindow.cpp \
     distributewindow.cpp \
-    fragile.cpp \
     loginwindow.cpp \
     main.cpp \
     mainwindow.cpp \
-    package.cpp \
     packageinfowindow.cpp \
     packagelistwindow.cpp \
     registerwindow.cpp \
     sendpackagewindow.cpp \
     signforpackagewindow.cpp \
-    user.cpp \
     userinfowindow.cpp \
     userlistwindow.cpp
 
 HEADERS += \
     addmoney.h \
-    administrator.h \
     adminwindow.h \
-    book.h \
     changepassword.h \
-    client.h \
     clientwindow.h \
-    common.h \
-    courier.h \
     courierwindow.h \
     distributewindow.h \
-    fragile.h \
     loginwindow.h \
     mainwindow.h \
-    package.h \
     packageinfowindow.h \
     packagelistwindow.h \
     registerwindow.h \
     sendpackagewindow.h \
     signforpackagewindow.h \
-    user.h \
     userinfowindow.h \
     userlistwindow.h
 

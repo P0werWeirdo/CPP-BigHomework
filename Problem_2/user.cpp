@@ -41,6 +41,7 @@ bool User::changePassword(QString oldPassword,QString newPassword)   //修改密
     this->password = newPassword;
     Client::saveClientList();
     Administrator::saveAdmin();
+    Courier::saveCourierList();
     return true;
 }
 bool User::changeBalance(double num){                                    //修改余额

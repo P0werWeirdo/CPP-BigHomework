@@ -1,14 +1,15 @@
 #include "packagelistwindow.h"
 #include "ui_packagelistwindow.h"
-#include"package.h"
-#include"user.h"
 #include<QMap>
 #include<QTableWidget>
 #include<QDebug>
 #include<packageinfowindow.h>
 #include<userinfowindow.h>
+#include"loginwindow.h"
+#include<QMessageBox>
+
 //status 0代表管理员 1代表用户
-PackageListWindow::PackageListWindow(QWidget *parent,User* tu,char status) :
+PackageListWindow::PackageListWindow(QJsonObject tu,char status,QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PackageListWindow)
 {
@@ -31,12 +32,8 @@ PackageListWindow::PackageListWindow(QWidget *parent,User* tu,char status) :
     ui->line_Search->setValidator( validator1 );
 
     /*设置默认显示的快递表*/
-    if(status == 0){
-        theMap = Package::packageList;
-    }
-    else{
-        theMap = theUser->getMyPackage();
-    }
+    initReq();
+
     /*初始化表格*/
     ui->PkgListTb->setColumnCount(4);
     ui->PkgListTb->setHorizontalHeaderLabels(QStringList()<<"快递单号"<<"发送方账号"<<"接收方账号"<<"状态");
@@ -72,33 +69,81 @@ PackageListWindow::PackageListWindow(QWidget *parent,User* tu,char status) :
 
 
     /*初始化表格逻辑*/
-    if(status != 3){
-        connect(ui->PkgListTb,&QTableWidget::itemDoubleClicked,this,&PackageListWindow::showDetailInfo);
-    }
-    /*初始化快递表*/
-    showMyPkg();
+    connect(ui->PkgListTb,&QTableWidget::itemDoubleClicked,this,&PackageListWindow::showDetailInfo);
 }
+
+//发送请求
+void PackageListWindow::initReq(){
+    /*构造Json字符串*/
+    QJsonObject obj;
+    obj.insert("target",8);
+    QJsonObject info;
+    info.insert("username",theUser["username"].toString());
+    info.insert("type",this->status);
+
+    obj.insert("info",info);
+    QJsonDocument doc;
+    doc.setObject(obj);
+    QByteArray abyte = doc.toJson(QJsonDocument::Compact);
+    qDebug() << abyte;
+    LoginWindow::con->write(abyte);
+    /*绑定逻辑*/
+    connect(LoginWindow::con,&QTcpSocket::readyRead,this,&PackageListWindow::initRes);
+}
+
+
+
+//收到回应
+void PackageListWindow::initRes(){
+    disconnect(LoginWindow::con,&QTcpSocket::readyRead,this,&PackageListWindow::initRes);
+
+    //读入并构造Json对象
+    QByteArray tmp = LoginWindow::con->readAll();
+    qDebug() << tmp;
+    QJsonDocument doc = QJsonDocument::fromJson(tmp);
+    QJsonObject obj = doc.object();
+
+
+    if(obj["status"].toInt() != 200){
+        QMessageBox::critical(this,"错误","服务器忙");
+    }
+    else{
+        //传入Json对象
+        QJsonArray client = obj["message"].toArray();
+        //依次读入快递信息
+        this->packageList.clear();
+        for(auto item = client.constBegin();item != client.constEnd();item++){
+            this->packageList.insert((*item).toObject()["index"].toString(),
+                    (*item).toObject());
+        }
+        showMyPkg();
+        return;
+    }
+}
+
+
+
+
 
 /*查看详细信息*/
 void PackageListWindow::showDetailInfo(QTableWidgetItem *item){
 
     if(item->column() == 0){
         PackageInfoWindow *pkgInfo = new PackageInfoWindow(
-                    Package::packageList[item->text()],this);
+                    this->packageList[item->text()],this);
         pkgInfo->show();
 
     }
     else if(item->column() == 1 || item->column() == 2){
-        UserInfoWindow *userInfo = new UserInfoWindow(
-                    Client::clientList[item->text()],this->status,this);
+        UserInfoWindow *userInfo = new UserInfoWindow(item->text(),2,this->status,this);
         userInfo->show();
     }
 }
 
 /*展示包裹*/
-void PackageListWindow::showList(QList<Package*> pkg){
+void PackageListWindow::showList(QList<QJsonObject> pkgList){
     /*无项目直接return*/
-    int len = pkg.length();
+    int len = pkgList.length();
     ui->PkgListTb->setRowCount(len);
     if(len == 0){
         return;
@@ -108,23 +153,37 @@ void PackageListWindow::showList(QList<Package*> pkg){
     for(int i = 0;i < len; i++){
         col = 0;
         //qDebug()<< pkg[i]->getIndex();
-        ui->PkgListTb->setItem(i,col++,new QTableWidgetItem(pkg[i]->getIndex()));
-        ui->PkgListTb->setItem(i,col++,new QTableWidgetItem(pkg[i]->getSender()->getUsername()));
-        ui->PkgListTb->setItem(i,col++,new QTableWidgetItem(pkg[i]->getRecver()->getUsername()));
-        ui->PkgListTb->setItem(i,col++,new QTableWidgetItem(pkg[i]->getStatusString()));
+        ui->PkgListTb->setItem(i,col++,new QTableWidgetItem(pkgList[i]["index"].toString()));
+        ui->PkgListTb->setItem(i,col++,new QTableWidgetItem(pkgList[i]["senderUsername"].toString()));
+        ui->PkgListTb->setItem(i,col++,new QTableWidgetItem(pkgList[i]["recverUsername"].toString()));
+        int status = pkgList[i]["status"].toInt();
+        QString st;
+
+        if(status == 1){
+            st = "待签收";
+        }
+        else if(status == 3){
+            st = "待揽收";
+        }
+        else{
+            st = "已签收";
+        }
+
+        ui->PkgListTb->setItem(i,col++,new QTableWidgetItem(st));
     }
 }
 
+
+
+
+
 /*展示我的包裹*/
 void PackageListWindow::showMyPkg(){
-    QList<Package *> tmp;
+    QList<QJsonObject> tmp;
     //转化为QList
 
-    QMap<QString,Package *>::const_iterator i = theMap.constBegin();
-
-    while(i != theMap.constEnd()){
-        tmp.push_back(i.value());
-        i++;
+    for(auto i = packageList.cbegin();i != packageList.cend();i++){
+        tmp.append(i.value());
     }
     showList(tmp);
     return;
@@ -132,17 +191,17 @@ void PackageListWindow::showMyPkg(){
 
 /*展示搜索结果*/
 void PackageListWindow::searchAndShow(){
-    QList <Package*> showPkgList;
+    QList <QJsonObject> showPkgList;
     if(ui->rb_Index->isChecked()){  //按快递号查找
-        if( theMap.contains(ui->line_Search->text()) ){
-            showPkgList.push_back(theMap[ui->line_Search->text()]);
+        if( packageList.contains(ui->line_Search->text()) ){
+            showPkgList.push_back(packageList[ui->line_Search->text()]);
         }
 
     }
     else if(ui->rb_Username->isChecked()){  //按用户名
-        for(auto iter = theMap.constBegin(); iter != theMap.constEnd();iter++){
-            if(iter.value()->getSender()->getUsername() == ui->line_Search->text() ||
-                    iter.value()->getRecver()->getUsername() == ui->line_Search->text()){
+        for(auto iter = packageList.constBegin(); iter != packageList.constEnd();iter++){
+            if(iter.value()["senderUsername"].toString() == ui->line_Search->text() ||
+                    iter.value()["recverUsername"].toString() == ui->line_Search->text()){
                 showPkgList.push_back(iter.value());
             }
         }
@@ -150,24 +209,34 @@ void PackageListWindow::searchAndShow(){
     }
     else if(ui->rb_Time->isChecked()){                                   //按时间
         QDate tmp = ui->date_Date->date();
-        for(auto iter = theMap.constBegin(); iter != theMap.constEnd();iter++){
-            if(iter.value()->getSendTime().date() == tmp ||
-                    iter.value()->getRecvTime().date() == tmp){
+
+        for(auto iter = packageList.constBegin(); iter != packageList.constEnd();iter++){
+
+            QDateTime senderTime = QDateTime::fromSecsSinceEpoch(getLongData(iter.value(),"senderTime"));
+            QDateTime collectorTime = QDateTime::fromSecsSinceEpoch(getLongData(iter.value(),"collectorTime"));
+            QDateTime recverTime = QDateTime::fromSecsSinceEpoch(getLongData(iter.value(),"recverTime"));
+
+            if(senderTime.date() == tmp ||
+                    collectorTime.date() == tmp || recverTime.date() == tmp){
                 showPkgList.push_back(iter.value());
             }
         }
     }
     else{   //按状态
         char status = ui->box_Status->currentIndex() + 1;
-        for(auto iter = theMap.constBegin(); iter != theMap.constEnd();iter++){
-            if(iter.value()->getStatus() == status){
+        for(auto iter = packageList.constBegin(); iter != packageList.constEnd();iter++){
+            if(iter.value()["status"].toInt() == status){
                 showPkgList.push_back(iter.value());
             }
         }
 
     }
-
     return showList(showPkgList);
+}
+
+
+qint64 PackageListWindow::getLongData(QJsonObject json, QString key){
+    return QString::number(json.value(key).toDouble(), 'f', 0).toLongLong();
 }
 
 PackageListWindow::~PackageListWindow()

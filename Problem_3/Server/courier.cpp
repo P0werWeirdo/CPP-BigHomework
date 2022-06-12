@@ -41,6 +41,7 @@ int Courier::registerNewCourier(QString username,QString password,QString name,Q
        return 5;
    }
    //手机号检测
+   qDebug()<<phoneNum.length();
    if(phoneNum.length() != 11){
         for(int i = 0;i < 11;i++){
             if(phoneNum[i] < '0' || phoneNum[i] > '9'){
@@ -104,6 +105,8 @@ bool Courier::deleteCourier(QString username){    //删除某一个快递员
 }
 
 bool Courier::collectPackage(QList<Package *> pkgList){
+    qDebug()<<"已经在揽收了";
+    qDebug() << pkgList.length();
     return Package::collectpkgList(pkgList,this);
 }
 

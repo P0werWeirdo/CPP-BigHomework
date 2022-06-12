@@ -3,6 +3,10 @@
 
 #include <QDialog>
 #include<client.h>
+#include<QJsonObject>
+#include<QJsonArray>
+#include<QJsonDocument>
+
 namespace Ui {
 class SendPackageWindow;
 }
@@ -12,16 +16,24 @@ class SendPackageWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit SendPackageWindow(QWidget *parent = nullptr,Client* theClient = NULL);
+    explicit SendPackageWindow(QJsonObject client,QWidget *parent = nullptr);
     ~SendPackageWindow();
     void initSenderInfo();
     void sendPackage();
     void showRecvInfo();
     void showPrice(int);       //展示价格
+    void sendInitRequest();       //发送初始化的请求
+    void initTotalUser();         //初始化
+    void showResult();
+
+
+
+
 signals:
     void sendFinish();
 private:
-    Client* theClient;
+    QJsonObject theClient;
+    QMap<QString,QList<QString>> totalUser;
 
     Ui::SendPackageWindow *ui;
 };

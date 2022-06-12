@@ -2,8 +2,12 @@
 #define PACKAGELISTWINDOW_H
 
 #include <QDialog>
-#include<user.h>
+
 #include<QTableWidgetItem>
+#include<QJsonObject>
+#include<QJsonArray>
+#include<QJsonDocument>
+
 namespace Ui {
 class PackageListWindow;
 }
@@ -13,17 +17,25 @@ class PackageListWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit PackageListWindow(QWidget *parent = nullptr,User* tu = NULL,char status = '0');
-    void showList(QList<Package*> pkg);
+    explicit PackageListWindow(QJsonObject tu,char status,QWidget *parent = nullptr);
+    void showList(QList<QJsonObject> pkgList);
     void showMyPkg();
     void searchAndShow();
     void showDetailInfo(QTableWidgetItem *item);
     ~PackageListWindow();
 
+    //发送请求
+    void initReq();
+
+    //收到回应
+    void initRes();
+
+
+    qint64 getLongData(QJsonObject json, QString key);
 private:
-    User *theUser;
-    char status;        //0代表管理员 1代表用户或者快递员 2代表不能继续查看
-    QMap<QString,Package *> theMap;
+    QJsonObject theUser;
+    char status;        //1代表管理员 2代表客户 3代表快递员
+    QMap<QString,QJsonObject> packageList;
     Ui::PackageListWindow *ui;
 };
 

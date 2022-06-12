@@ -19,7 +19,7 @@ public:
     void showRecvInfo();
     void showPrice(int);       //展示价格
 signals:
-    void sendFinish();
+    void sendFinish()const;
 private:
     Client* theClient;
 

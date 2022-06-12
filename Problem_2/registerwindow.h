@@ -20,7 +20,7 @@ public:
     void registerCourier();     //快递员注册
     void closeEvent(QCloseEvent * event);
 signals:
-    void hasFinish();
+    void hasFinish()const;
 
 private:
     Ui::RegisterWindow *ui;

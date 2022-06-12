@@ -2,7 +2,8 @@
 #define COURIERWINDOW_H
 
 #include <QDialog>
-#include"courier.h"
+#include<QJsonObject>
+#include<QJsonArray>
 
 namespace Ui {
 class CourierWindow;
@@ -13,16 +14,19 @@ class CourierWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit CourierWindow(Courier *,QWidget *parent = nullptr);
+    explicit CourierWindow(QJsonObject courier,QWidget *parent = nullptr);
 
     void showInfo();        //展示信息
+
+    void freshUserRequest();       //刷新信息
+    void freshSuccess();
     ~CourierWindow();
 signals:
     void courierExit();
 
 private:
     Ui::CourierWindow *ui;
-    Courier *theCourier;
+    QJsonObject theCourier;
 };
 
 #endif // COURIERWINDOW_H

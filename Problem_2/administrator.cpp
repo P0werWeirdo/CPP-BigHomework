@@ -52,7 +52,7 @@ bool Administrator::saveAdmin(){
     return true;
 }
 
-bool Administrator::distribute(QString courier,QString pkg){
+bool Administrator::distribute(QString courier,QString pkg)const{
     if(Courier::courierList.contains(courier) && Package::packageList.contains(pkg)){
         Courier *thecourier = Courier::courierList[courier];
         QString tmp = pkg;
@@ -69,6 +69,6 @@ int Administrator::getType(){
     return 1;
 }
 
-bool Administrator::checkAdmin(QString username,QString password){
+bool Administrator::checkAdmin(QString username,QString password)const{
     return (admin.username == username) && (admin.password == password);
 }

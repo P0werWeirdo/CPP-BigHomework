@@ -151,8 +151,8 @@ void PackageListWindow::searchAndShow(){
     else if(ui->rb_Time->isChecked()){                                   //按时间
         QDate tmp = ui->date_Date->date();
         for(auto iter = theMap.constBegin(); iter != theMap.constEnd();iter++){
-            if(iter.value()->getSendTime().date() == tmp ||
-                    iter.value()->getRecvTime().date() == tmp){
+            if(iter.value()->getSendTime().date() == tmp || iter.value()->getCollectTime().date() == tmp
+                    || iter.value()->getRecvTime().date() == tmp){
                 showPkgList.push_back(iter.value());
             }
         }

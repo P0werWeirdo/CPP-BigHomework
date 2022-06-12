@@ -27,7 +27,7 @@ public:
     void showAllPkg();              //展示所有包裹
     void showDetailInfo(QTableWidgetItem *item);
 signals:
-    void collectFinish();
+    void collectFinish()const;
 
 private:
     User* theUser;

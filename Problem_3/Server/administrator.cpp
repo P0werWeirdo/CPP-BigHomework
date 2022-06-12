@@ -52,7 +52,7 @@ bool Administrator::saveAdmin(){
     return true;
 }
 
-bool Administrator::distribute(QString courier,QString pkg){
+bool Administrator::distribute(QString courier,QString pkg)const{
     if(Courier::courierList.contains(courier) && Package::packageList.contains(pkg)){
         Courier *thecourier = Courier::courierList[courier];
         QString tmp = pkg;

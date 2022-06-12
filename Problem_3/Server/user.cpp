@@ -40,6 +40,7 @@ bool User::changePassword(QString oldPassword,QString newPassword)   //修改密
     }
     this->password = newPassword;
     Client::saveClientList();
+    Courier::saveCourierList();
     Administrator::saveAdmin();
     return true;
 }

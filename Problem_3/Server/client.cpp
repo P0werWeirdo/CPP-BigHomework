@@ -87,9 +87,9 @@ bool Client::saveClientList(){
     return true;
 }
 
-bool Client::sendPackage(Client* recver,QString remarks,double number,char type){    //发送快递
+QString Client::sendPackage(Client* recver,QString remarks,double number,char type){    //发送快递
     if(remarks.length() == 0 || remarks.length() > 200){
-        return false;
+        return "";
     }
     Package* newpkg = NULL;
     switch (type) {
@@ -103,12 +103,12 @@ bool Client::sendPackage(Client* recver,QString remarks,double number,char type)
         newpkg = new Common(this,recver,remarks,number);
         break;
     default:
-        return false;
+        return "";
     }
 
     if(this->balance < newpkg->getPrice()){
         delete newpkg;
-        return false;
+        return "";
     }
     else{
         this->balance -=newpkg->getPrice();
@@ -121,7 +121,7 @@ bool Client::sendPackage(Client* recver,QString remarks,double number,char type)
     Administrator::saveAdmin();
     Client::saveClientList();
     Package::savePackage();
-    return true;
+    return newpkg->getIndex();
 }
 
 bool Client::recvPackage(QList<Package *> pkgList){ //接受快递

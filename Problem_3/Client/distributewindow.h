@@ -2,8 +2,10 @@
 #define DISTRIBUTEWINDOW_H
 
 #include <QDialog>
-#include"package.h"
-#include"courier.h"
+#include<QJsonObject>
+#include<QJsonDocument>
+#include<QJsonArray>
+#include<QMap>
 
 namespace Ui {
 class DistributeWindow;
@@ -14,10 +16,16 @@ class DistributeWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit DistributeWindow(Package *,QWidget *parent = nullptr);
+    explicit DistributeWindow(QJsonObject,QWidget *parent = nullptr);
     ~DistributeWindow();
 
+    //初始化
+    void sendCourierReq();
+    void initCourierList();
     void searchCourier();
+
+    //
+    void sendDistributeReq();
     void distributeConfirm();
     void closeEvent(QCloseEvent *);
 
@@ -26,7 +34,8 @@ signals:
 
 private:
     Ui::DistributeWindow *ui;
-    Package* thePkg;
+    QJsonObject thePkg;
+    QMap<QString, QJsonObject> courierList;
 };
 
 #endif // DISTRIBUTEWINDOW_H

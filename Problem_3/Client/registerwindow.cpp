@@ -1,9 +1,12 @@
 #include "registerwindow.h"
+#include"loginwindow.h"
 #include "ui_registerwindow.h"
-#include"client.h"
 #include<QCloseEvent>
 #include<QMessageBox>
 #include<QRegExpValidator>
+#include<QJsonObject>
+#include<QJsonArray>
+#include<QJsonDocument>
 RegisterWindow::RegisterWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::RegisterWindow)
@@ -28,7 +31,7 @@ RegisterWindow::RegisterWindow(QWidget *parent) :
     ui->PhoneNum_Line->setValidator(validator2);
 
     /*绑定窗口按钮逻辑*/
-    connect(ui->btn_Confirm,&QPushButton::clicked,this,&RegisterWindow::registerClient);
+    connect(ui->btn_Confirm,&QPushButton::clicked,this,&RegisterWindow::clientRequest);
     connect(ui->btn_Cancel,&QPushButton::clicked,[=](){
         this->close();
     });
@@ -63,17 +66,93 @@ RegisterWindow::RegisterWindow(int admin,QWidget *parent):
     ui->PhoneNum_Line->setValidator(validator2);
 
     /*绑定窗口按钮逻辑*/
-    connect(ui->btn_Confirm,&QPushButton::clicked,this,&RegisterWindow::registerCourier);
+    connect(ui->btn_Confirm,&QPushButton::clicked,this,&RegisterWindow::courierRequest);
     connect(ui->btn_Cancel,&QPushButton::clicked,[=](){
         this->close();
     });
 }
 
+void RegisterWindow::clientRequest(){
+    /*构造Json字符串*/
+    QJsonObject obj;
+    obj.insert("target",4);
+    QJsonObject user;
+    user.insert("username",ui->Username_Line->text());
+    user.insert("password",ui->Password_Line->text());
+    user.insert("name",ui->Name_Line->text());
+    user.insert("phone",ui->PhoneNum_Line->text());
+    user.insert("address",ui->Addr_Line->toPlainText());
+    obj.insert("user",user);
+
+    //发送
+    QJsonDocument doc;
+    doc.setObject(obj);
+    QByteArray abyte = doc.toJson(QJsonDocument::Compact);
+    LoginWindow::con->write(abyte);
+    connect(LoginWindow::con,&QTcpSocket::readyRead,this,&RegisterWindow::clientResHandle);
+}
+
+void RegisterWindow::clientResHandle() {            //处理
+    disconnect(LoginWindow::con,&QTcpSocket::readyRead,this,&RegisterWindow::clientResHandle);
+
+    //解读Json
+    QByteArray tmp = LoginWindow::con->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(tmp);
+    QJsonObject obj = doc.object();
+
+    if(obj["status"].toInt() == 200){
+        QJsonArray message = obj["message"].toArray();
+        registerClient(message[0].toObject()["result"].toInt());
+    }
+    else{
+        QMessageBox::critical(this,"失败","服务器出错");
+    }
+}
+
+
+void RegisterWindow::courierRequest(){
+    /*构造Json字符串*/
+    QJsonObject obj;
+    obj.insert("target",5);
+    QJsonObject user;
+    user.insert("username",ui->Username_Line->text());
+    user.insert("password",ui->Password_Line->text());
+    user.insert("name",ui->Name_Line->text());
+    user.insert("phone",ui->PhoneNum_Line->text());
+    obj.insert("user",user);
+
+    //发送
+    QJsonDocument doc;
+    doc.setObject(obj);
+    QByteArray abyte = doc.toJson(QJsonDocument::Compact);
+    LoginWindow::con->write(abyte);
+    connect(LoginWindow::con,&QTcpSocket::readyRead,this,&RegisterWindow::courierResHandle);
+}
+
+
+
+void RegisterWindow::courierResHandle(){            //处理
+
+    disconnect(LoginWindow::con,&QTcpSocket::readyRead,this,&RegisterWindow::courierResHandle);
+
+    //解读Json
+    QByteArray tmp = LoginWindow::con->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(tmp);
+    QJsonObject obj = doc.object();
+
+    if(obj["status"].toInt() == 200){
+        QJsonArray message = obj["message"].toArray();
+        registerCourier(message[0].toObject()["result"].toInt());
+    }
+    else{
+        QMessageBox::critical(this,"失败","服务器出错");
+    }
+}
+
 
 //注册用户
-void RegisterWindow::registerClient(){
-    int tmp = Client::registerNewClient(ui->Username_Line->text(),ui->Password_Line->text(),
-                                ui->Name_Line->text(),ui->PhoneNum_Line->text(),ui->Addr_Line->toPlainText());
+void RegisterWindow::registerClient(int result){
+    int tmp = result;
     //判断是否成功注册，并给予提示消息
     switch (tmp) {
     case 1:
@@ -106,9 +185,8 @@ void RegisterWindow::registerClient(){
 }
 
 //注册快递员
-void RegisterWindow::registerCourier(){
-    int tmp = Courier::registerNewCourier(ui->Username_Line->text(),ui->Password_Line->text(),
-                                ui->Name_Line->text(),ui->PhoneNum_Line->text());
+void RegisterWindow::registerCourier(int result){
+    int tmp = result;
     //判断是否成功注册，并给予提示消息
     switch (tmp) {
     case 1:

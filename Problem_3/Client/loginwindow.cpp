@@ -15,7 +15,7 @@
 #include<QJsonObject>
 #include<QJsonArray>
 #include<QJsonDocument>
-static QTcpSocket *con;
+QTcpSocket* LoginWindow::con;
 
 LoginWindow::LoginWindow(QDialog *parent) :
     QDialog(parent),
@@ -47,76 +47,152 @@ LoginWindow::LoginWindow(QDialog *parent) :
         this->close();
     });
     connect(ui->btn_Register,&QPushButton::clicked,this,&LoginWindow::userRegister);
-    /*初始化用户和包裹数据*/
-//    qDebug()<< Client::clientList.value("1234");
-//    qDebug()<< Client::clientList.size();
+
     /*初始化连接*/
     initConnect();
 }
 
 bool LoginWindow::userLogin(){
 
+    if(ui->Username_Line->text().length() == 0 ||
+            ui->Password_Line->text().length() == 0){
+        ui->Input_Error->setText("用户名和密码不得为空");
+        ui->Input_Error->show();
+        return false;
+    }
+
+
     if(ui->btn_Client->isChecked()){        //根据radio按钮判断是否选中
-//        qDebug()<<"客户选中";
-        //用户不存在 或者 密码错误
-          if(Client::clientList.contains(ui->Username_Line->text()) == false ||
-             Client::clientList[ui->Username_Line->text()]->getPassword() != ui->Password_Line->text()){
-            ui->Input_Error->setText("用户不存在或密码错误");
-            ui->Input_Error->show();
-          }
-          else{
-             ClientWindow *cw = new ClientWindow(this,Client::clientList[ui->Username_Line->text()]); //挂到对象树上
-             connect(cw,&ClientWindow::clientExit,[=](){
-                 ui->Password_Line->setText("");
-                 ui->Input_Error->hide();
-                 this->show();
-             });
-             ui->Input_Error->hide();
-             cw->show();
-             this->hide();
-             return true;
-          }
+        /*构造Json字符串*/
+        QJsonObject obj;
+        obj.insert("target",3);
+        QJsonObject user;
+        user.insert("username",ui->Username_Line->text());
+        user.insert("password",ui->Password_Line->text());
+        obj.insert("user",user);
+        QJsonDocument doc;
+        doc.setObject(obj);
+        QByteArray abyte = doc.toJson(QJsonDocument::Compact);
+        con->write(abyte);
+        connect(con,&QTcpSocket::readyRead,this,&LoginWindow::clientLogin);
     }
     else if(ui->btn_Courier->isChecked()){  //快递员判定
-        if(Courier::courierList.contains(ui->Username_Line->text()) == false ||
-           Courier::courierList[ui->Username_Line->text()]->getPassword() != ui->Password_Line->text()){
-          ui->Input_Error->setText("快递员不存在或密码错误");
-          ui->Input_Error->show();
-        }
-        else{
-            CourierWindow *cw = new CourierWindow(Courier::courierList[ui->Username_Line->text()],this);
-            connect(cw,&CourierWindow::courierExit,[=](){
-                ui->Password_Line->setText("");
-                this->show();
-            });
-            ui->Input_Error->hide();
-            cw->setModal(true);
-            this->hide();
-            cw->show();
-            return true;
-        }
+        /*构造Json字符串*/
+        QJsonObject obj;
+        obj.insert("target",2);
+        QJsonObject user;
+        user.insert("username",ui->Username_Line->text());
+        user.insert("password",ui->Password_Line->text());
+        obj.insert("user",user);
+        QJsonDocument doc;
+        doc.setObject(obj);
+        QByteArray abyte = doc.toJson(QJsonDocument::Compact);
+        con->write(abyte);
+        connect(con,&QTcpSocket::readyRead,this,&LoginWindow::courierLogin);
     }
-    else{
-//        qDebug()<<"管理员选中";
-        if(Administrator::admin.getUsername() !=  ui->Username_Line->text()||
-           Administrator::admin.getPassword() !=  ui->Password_Line->text()){
-          ui->Input_Error->setText("管理员不存在或密码错误");
-          ui->Input_Error->show();
-        }
-        else{
-           AdminWindow *aw = new AdminWindow(this);  //挂到对象树上
-           connect(aw,&AdminWindow::adminExit,[=](){
-               ui->Password_Line->setText("");
-               this->show();
-           });
-           ui->Input_Error->hide();
-           aw->setModal(true);
-           this->hide();
-           aw->show();
-           return true;
-        }
+    else{//管理员
+        /*构造Json字符串*/
+        QJsonObject obj;
+        obj.insert("target",1);
+        QJsonObject user;
+        user.insert("username",ui->Username_Line->text());
+        user.insert("password",ui->Password_Line->text());
+        obj.insert("user",user);
+        QJsonDocument doc;
+        doc.setObject(obj);
+        QByteArray abyte = doc.toJson(QJsonDocument::Compact);
+        con->write(abyte);
+        connect(con,&QTcpSocket::readyRead,this,&LoginWindow::adminLogin);
     }
     return false;
+}
+
+//管理员登录
+void LoginWindow::adminLogin(){
+//    qDebug()<<"管理员选中";
+
+    //解除绑定
+    disconnect(con,&QTcpSocket::readyRead,this,&LoginWindow::adminLogin);
+
+    //读入并构造Json对象
+    QByteArray tmp = con->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(tmp);
+    QJsonObject obj = doc.object();
+//    qDebug()<< obj["status"].toInt();
+    if(obj["status"].toInt() != 200){
+        ui->Input_Error->setText("管理员不存在或密码错误");
+        ui->Input_Error->show();
+    }
+    else{
+        ui->Input_Error->hide();
+        //传入操作
+        QJsonObject admin = obj["message"].toArray()[0].toObject();
+        AdminWindow *aw = new AdminWindow(admin,this);  //挂到对象树上
+        connect(aw,&AdminWindow::adminExit,[=](){
+            ui->Password_Line->setText("");
+            this->show();
+        });
+        ui->Input_Error->hide();
+        aw->setModal(true);
+        this->hide();
+        aw->show();
+    }
+}
+
+//客户登录
+void LoginWindow::clientLogin(){
+    disconnect(con,&QTcpSocket::readyRead,this,&LoginWindow::clientLogin);
+
+    //读入并构造Json对象
+    QByteArray tmp = con->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(tmp);
+    QJsonObject obj = doc.object();
+
+    if(obj["status"].toInt() != 200){
+        ui->Input_Error->setText("用户不存在或密码错误");
+        ui->Input_Error->show();
+    }
+    else{
+        //传入Json对象
+        QJsonObject client = obj["message"].toArray()[0].toObject();
+        ClientWindow *cw = new ClientWindow(client,this); //挂到对象树上
+        connect(cw,&ClientWindow::clientExit,[=](){
+            ui->Password_Line->setText("");
+            ui->Input_Error->hide();
+            this->show();
+        });
+        ui->Input_Error->hide();
+        cw->show();
+        this->hide();
+        return;
+    }
+}
+//快递员
+void LoginWindow::courierLogin(){
+    disconnect(con,&QTcpSocket::readyRead,this,&LoginWindow::courierLogin);
+
+    //读入并构造Json对象
+    QByteArray tmp = con->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(tmp);
+    QJsonObject obj = doc.object();
+
+    if(obj["status"].toInt() != 200){
+        ui->Input_Error->setText("快递员不存在或密码错误");
+        ui->Input_Error->show();
+    }
+    else{
+        //传入Json对象
+        QJsonObject courier = obj["message"].toArray()[0].toObject();
+        CourierWindow *cw = new CourierWindow(courier,this);
+        connect(cw,&CourierWindow::courierExit,[=](){
+            ui->Password_Line->setText("");
+            this->show();
+        });
+        ui->Input_Error->hide();
+        cw->setModal(true);
+        this->hide();
+        cw->show();
+    }
 }
 
 void LoginWindow::userRegister(){      //用户注册函数
@@ -135,7 +211,6 @@ void LoginWindow::initConnect(){
 
     connect(con, SIGNAL(readyRead()), &loop, SLOT(quit()));
     connect(con, SIGNAL(disconnected()), &loop, SLOT(quit()));
-
 }
 
 LoginWindow::~LoginWindow()

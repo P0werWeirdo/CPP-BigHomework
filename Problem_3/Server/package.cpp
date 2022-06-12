@@ -208,9 +208,9 @@ void Package::initPackage(){
                 if(pkg->collector){
                     pkg->collector->saveToMyPackage(pkg);
                 }
-                else if(pkg->getStatus() == 3){ //若没分配，存到管理员那里
-                    Administrator::admin.saveToMyPackage(pkg);
-                }
+                //存到管理员那里
+                Administrator::admin.saveToMyPackage(pkg);
+
 
                 //保存到recver表里
                 if(pkg->recver){

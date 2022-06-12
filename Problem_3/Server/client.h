@@ -18,7 +18,7 @@ public:
     static bool saveClientList();
 
     /*对快递进行相关操作*/
-    bool sendPackage(Client *recver,QString remarks,double price,char type);    //发送快递
+    QString sendPackage(Client *recver,QString remarks,double number,char type);    //发送快递
     bool recvPackage(QList<Package *> pkgList);
 
     static QMap<QString,Client *> clientList;      //总客户表
