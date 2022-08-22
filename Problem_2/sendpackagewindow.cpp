@@ -39,7 +39,7 @@ SendPackageWindow::SendPackageWindow(QWidget *parent,Client* theClient) :
     QPalette pa;
     pa.setColor(QPalette::WindowText, Qt::red);
     ui->Price_Label->setPalette(pa);
-    ui->Price_Label->setText("7.5");
+    ui->Price_Label->setText("8");
     /*绑定按钮逻辑*/
     connect(ui->btn_Confirm_2,&QPushButton::clicked,[=](){
         sendPackage();
@@ -136,7 +136,7 @@ void SendPackageWindow::showPrice(int){
     double price = 0.0;
     switch (ui->typeOfPkg->currentIndex()) {
     case 0:
-        price = 7.5 * ui->numberOfPkg->value();
+        price = 8 * ui->numberOfPkg->value();
         break;
     case 1:
         price = 2 * ui->numberOfPkg->value();

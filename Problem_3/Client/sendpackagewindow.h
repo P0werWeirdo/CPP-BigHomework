@@ -2,10 +2,10 @@
 #define SENDPACKAGEWINDOW_H
 
 #include <QDialog>
-#include<client.h>
 #include<QJsonObject>
 #include<QJsonArray>
 #include<QJsonDocument>
+#include<QMap>
 
 namespace Ui {
 class SendPackageWindow;

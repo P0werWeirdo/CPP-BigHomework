@@ -12,5 +12,5 @@ Fragile::Fragile(Client* sender,Client *recver,QString remark,double number) : P
 
 double Fragile::getPrice(){
     //
-    return this->getNumber() * 7.5;
+    return this->getNumber() * 8;
 }

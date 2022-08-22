@@ -2,13 +2,9 @@
 #include "ui_loginwindow.h"
 #include<QFile>
 #include<QDebug>
-#include"package.h"
-#include"client.h"
-#include"administrator.h"
 #include"adminwindow.h"
 #include"registerwindow.h"
 #include"clientwindow.h"
-#include"courier.h"
 #include<QRegExpValidator>
 #include"courierwindow.h"
 #include<QHostAddress>

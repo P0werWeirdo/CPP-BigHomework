@@ -1,7 +1,6 @@
 #include "userlistwindow.h"
 #include "ui_userlistwindow.h"
 #include"userinfowindow.h"
-#include"courier.h"
 #include<QMessageBox>
 #include"loginwindow.h"
 

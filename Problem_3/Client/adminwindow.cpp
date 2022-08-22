@@ -1,6 +1,5 @@
 #include "adminwindow.h"
 #include "ui_adminwindow.h"
-#include"administrator.h"
 #include"packagelistwindow.h"
 #include"userlistwindow.h"
 #include"changepassword.h"

@@ -21,7 +21,7 @@ PackageListWindow::PackageListWindow(QWidget *parent,User* tu,char status) :
     /*设置页面信息*/
     this->setWindowModality(Qt::WindowModal);
     this->setWindowTitle("快递信息");
-    ui->rb_Username->click();
+    ui->rb_UsernameSender->click();
     ui->date_Date->setDate(QDate::currentDate());
     ui->date_Date->hide();
     ui->box_Status->hide();
@@ -54,7 +54,12 @@ PackageListWindow::PackageListWindow(QWidget *parent,User* tu,char status) :
         ui->date_Date->hide();
         ui->box_Status->hide();
     });
-    connect(ui->rb_Username,&QRadioButton::clicked,[=](){
+    connect(ui->rb_UsernameSender,&QRadioButton::clicked,[=](){
+        ui->line_Search->show();
+        ui->date_Date->hide();
+        ui->box_Status->hide();
+    });
+    connect(ui->rb_UsernameRecver,&QRadioButton::clicked,[=](){
         ui->line_Search->show();
         ui->date_Date->hide();
         ui->box_Status->hide();
@@ -139,14 +144,20 @@ void PackageListWindow::searchAndShow(){
         }
 
     }
-    else if(ui->rb_Username->isChecked()){  //按用户名
+    else if(ui->rb_UsernameSender->isChecked()){  //按用户名
         for(auto iter = theMap.constBegin(); iter != theMap.constEnd();iter++){
-            if(iter.value()->getSender()->getUsername() == ui->line_Search->text() ||
-                    iter.value()->getRecver()->getUsername() == ui->line_Search->text()){
+            if(iter.value()->getSender()->getUsername() == ui->line_Search->text()){
                 showPkgList.push_back(iter.value());
             }
         }
 
+    }
+    else if(ui->rb_UsernameRecver->isChecked()){
+        for(auto iter = theMap.constBegin(); iter != theMap.constEnd();iter++){
+            if( iter.value()->getRecver()->getUsername() == ui->line_Search->text()){
+                showPkgList.push_back(iter.value());
+            }
+        }
     }
     else if(ui->rb_Time->isChecked()){                                   //按时间
         QDate tmp = ui->date_Date->date();

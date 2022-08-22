@@ -11,6 +11,7 @@ Administrator::Administrator()
 
 void Administrator::initAdmin(){
     QFile file(QCoreApplication::applicationDirPath() + "/data/admin.txt");          //读入文件
+    qDebug() << QCoreApplication::applicationDirPath();
     file.open(QIODevice::ReadOnly| QIODevice::Text);
     //查看文件是否打开，打不开直接退出
     if(file.isOpen()){
